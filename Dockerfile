@@ -9,7 +9,8 @@ ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 RUN apt-get install -y openjdk-8-jdk
 
 # Install basics
-RUN apt-get install -y git wget curl unzip build-essential ruby ruby-dev ruby-ffi gcc make
+RUN apt-get install -y git wget curl unzip build-essential ruby ruby-dev ruby-ffi gcc make \
+    pkg-config meson ninja-build libavcodec-dev libavformat-dev libavutil-dev libsdl2-dev
 
 # Install node
 ENV NODE_VERSION=10.15.3
@@ -46,6 +47,15 @@ RUN mkdir -p $ANDROID_SDK_ROOT && cd $ANDROID_SDK_ROOT && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     apt-get autoremove -y && \
     apt-get clean
+
+# Install Scrcpy
+ENV SCRCPY_VER=1.8
+RUN cd /opt && git clone https://github.com/Genymobile/scrcpy && \
+    cd scrcpy && \
+    curl -L -o scrcpy-server.jar https://github.com/Genymobile/scrcpy/releases/download/v${SCRCPY_VER}/scrcpy-server-v${SCRCPY_VER}.jar && \
+    meson x --buildtype release --strip -Db_lto=true -Dprebuilt_server=scrcpy-server.jar && \
+    cd x && ninja && ninja install && \
+    rm -rf /opt/scrcpy
 
 RUN mkdir myApp
 WORKDIR /myApp
