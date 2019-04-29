@@ -1,5 +1,5 @@
 FROM ubuntu:18.04
-LABEL name="ionic" author="Diego Varela" version="4.12.0" maintainer="diegovarela.paiva@hotmail.com"
+LABEL name="ionic" author="Diego Varela" maintainer="diegovarela.paiva@hotmail.com"
 
 # Update
 RUN apt-get update
