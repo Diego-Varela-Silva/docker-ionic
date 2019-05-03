@@ -1,16 +1,10 @@
 FROM ubuntu:18.04
 LABEL name="ionic" author="Diego Varela" maintainer="diegovarela.paiva@hotmail.com"
 
-# Update
-RUN apt-get update
-
-# Install java
-ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
-RUN apt-get install -y openjdk-8-jdk
-
 # Install basics
-RUN apt-get install -y git wget curl unzip build-essential ruby ruby-dev ruby-ffi gcc make \
-    pkg-config meson ninja-build libavcodec-dev libavformat-dev libavutil-dev libsdl2-dev
+ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+RUN apt-get update && apt-get install -y openjdk-8-jdk git wget curl unzip build-essential ruby ruby-dev ruby-ffi \
+    gcc make pkg-config meson ninja-build libavcodec-dev libavformat-dev libavutil-dev libsdl2-dev zsh
 
 # Install node
 ENV NODE_VERSION=10.15.3
@@ -57,6 +51,63 @@ RUN cd /opt && git clone https://github.com/Genymobile/scrcpy && \
     cd x && ninja && ninja install && \
     rm -rf /opt/scrcpy
 
+# Install Chrome
+RUN apt-get update && \
+    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
+    apt-get install -y software-properties-common &&\
+    apt-add-repository "deb http://archive.canonical.com/ubuntu $(lsb_release -sc) partner" && \
+    apt-add-repository ppa:malteworld/ppa && apt-get update && apt-get install -y \
+    adobe-flashplugin \
+    msttcorefonts \
+    fonts-noto-color-emoji \
+    fonts-noto-cjk \
+    fonts-liberation \
+    fonts-thai-tlwg \
+    fontconfig \
+    libappindicator3-1 \
+    pdftk \
+    unzip \
+    locales \
+    gconf-service \
+    libasound2 \
+    libatk1.0-0 \
+    libc6 \
+    libcairo2 \
+    libcups2 \
+    libdbus-1-3 \
+    libexpat1 \
+    libfontconfig1 \
+    libgcc1 \
+    libgconf-2-4 \
+    libgdk-pixbuf2.0-0 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnspr4 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libstdc++6 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxi6 \
+    libxrandr2 \
+    libxrender1 \
+    libxss1 \
+    libxtst6 \
+    ca-certificates \
+    libappindicator1 \
+    libnss3 \
+    lsb-release \
+    xdg-utils \
+    xvfb && \
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    dpkg -i google-chrome-stable_current_amd64.deb && apt-get install -f && \
+    rm google-chrome-stable_current_amd64.deb
+
 RUN mkdir myApp
 WORKDIR /myApp
-EXPOSE 8100 35729
