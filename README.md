@@ -22,7 +22,7 @@ alias npm='docker exec -it ionic npm'
 ionic_docker_start
 ```
 
-* You are ready to go with ionic adb and scrcpy
+* You are ready to go with ionic, adb, scrcpy and other stuff! 
 
 ```
 ionic serve
