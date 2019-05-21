@@ -4,7 +4,7 @@ LABEL name="ionic" author="Diego Varela" maintainer="diegovarela.paiva@hotmail.c
 # Install basics
 ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 RUN apt-get update && apt-get install -y openjdk-8-jdk git wget curl unzip build-essential ruby ruby-dev ruby-ffi \
-    gcc make pkg-config meson ninja-build libavcodec-dev libavformat-dev libavutil-dev libsdl2-dev zsh
+    gcc make pkg-config meson ninja-build libavcodec-dev libavformat-dev libavutil-dev libsdl2-dev zsh nano vim
 
 # Install node
 ENV NODE_VERSION=10.15.3
