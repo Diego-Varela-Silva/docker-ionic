@@ -17,16 +17,16 @@ ionicDockerStart() {
         -v $PWD:/myApp:rw \
         -e DISPLAY=$DISPLAY \
         diegovarela/ionic
-    docker cp ~/.ssh $1:/root/.ssh
-    docker exec -it $1 chown -R root:users /root/.ssh
-    docker cp ~/.gitconfig $1:/etc/gitconfig
-    docker cp ~/.gitmessage $1:/root/.gitmessage
+    docker cp ~/.ssh $CURRENT_DIR:/root/.ssh
+    docker exec -it $CURRENT_DIR chown -R root:users /root/.ssh
+    docker cp ~/.gitconfig $CURRENT_DIR:/etc/gitconfig
+    docker cp ~/.gitmessage $CURRENT_DIR:/root/.gitmessage
 }
 
 ionicDockerStop() {
     CURRENT_DIR=${PWD##*/}
-    docker stop CURRENT_DIR
-    docker rm CURRENT_DIR
+    docker stop $CURRENT_DIR
+    docker rm $CURRENT_DIR
 }
 ```
 
