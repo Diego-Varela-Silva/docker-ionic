@@ -39,5 +39,5 @@ ionicDockerStart
 * Also on the project folde, after the usage you can stop the machine
 
 ```
-ionicDockerStop myDocker
+ionicDockerStop
 ```
