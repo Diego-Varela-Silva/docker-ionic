@@ -16,9 +16,9 @@ RUN curl --retry 3 -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSI
 ENV NPM_VERSION=6.9.0
 RUN npm install -g npm@"$NPM_VERSION"
 
-# Install ionic and cordova
-ENV CORDOVA_VERSION=8.1.2 IONIC_VERSION=4.12.0
-RUN npm install -g cordova@"$CORDOVA_VERSION" ionic@"$IONIC_VERSION"
+# Install ionic dev dependencies
+ENV CORDOVA_VERSION=8.1.2 IONIC_VERSION=4.12.0 YARN=1.16.0
+RUN npm install -g cordova@"$CORDOVA_VERSION" ionic@"$IONIC_VERSION" YARN@"$YARN" @angular/language-service@7.1
 
 # Install Gradle
 ENV GRADLE_VERSION=5.4.1
