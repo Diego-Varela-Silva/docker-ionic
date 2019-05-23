@@ -9,30 +9,34 @@ Container for develop with ionic 4
 ```
 ionicDockerStart() {
     xhost + local:docker
-    docker run --name $1 -dt --net host --privileged \
+    CURRENT_DIR=${PWD##*/}
+    docker run --name $CURRENT_DIR -dt --net host --privileged \
         -v /dev/bus/usb:/dev/bus/usb \
         -v ~/.gradle:/root/.gradle \
         -v /tmp/.X11-unix:/tmp/.X11-unix \
         -v $PWD:/myApp:rw \
-        -v ~/.gitconfig:/etc/gitconfig \
-        -v ~/.gitmessage:/root/.gitmessage \
         -e DISPLAY=$DISPLAY \
         diegovarela/ionic
+    docker cp ~/.ssh $1:/root/.ssh
+    docker exec -it $1 chown -R root:users /root/.ssh
+    docker cp ~/.gitconfig $1:/etc/gitconfig
+    docker cp ~/.gitmessage $1:/root/.gitmessage
 }
 
 ionicDockerStop() {
-    docker stop $1
-    docker rm $1
+    CURRENT_DIR=${PWD##*/}
+    docker stop CURRENT_DIR
+    docker rm CURRENT_DIR
 }
 ```
 
-* Then start the machine in your project folder
+* Then start the machine on your project folder
 
 ```
-ionicDockerStart myDocker
+ionicDockerStart
 ```
 
-* After the usage you can stop the machine
+* Also on the project folde, after the usage you can stop the machine
 
 ```
 ionicDockerStop myDocker
