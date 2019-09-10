@@ -7,18 +7,18 @@ RUN apt-get update && apt-get install -y openjdk-8-jdk git wget curl unzip build
     gcc make pkg-config meson ninja-build libavcodec-dev libavformat-dev libavutil-dev libsdl2-dev zsh nano vim
 
 # Install node
-ENV NODE_VERSION=10.15.3
+ENV NODE_VERSION=8.11.3
 RUN curl --retry 3 -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" && \
     tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 && \
     rm "node-v$NODE_VERSION-linux-x64.tar.gz"
 
 # Update NPM
-ENV NPM_VERSION=6.9.0
+ENV NPM_VERSION=6.4.1
 RUN npm install -g npm@"$NPM_VERSION"
 
 # Install ionic dev dependencies
-ENV CORDOVA_VERSION=8.1.2 IONIC_VERSION=4.12.0 YARN=1.16.0
-RUN npm install -g cordova@"$CORDOVA_VERSION" ionic@"$IONIC_VERSION" yarn@"$YARN" @angular/language-service@7.1
+ENV CORDOVA_VERSION=8.0.0 IONIC_VERSION=3.20.0
+RUN npm install -g cordova@"$CORDOVA_VERSION" ionic@"$IONIC_VERSION"
 
 # Install Gradle
 ENV GRADLE_VERSION=5.4.1
@@ -43,7 +43,7 @@ RUN mkdir -p $ANDROID_SDK_ROOT && cd $ANDROID_SDK_ROOT && \
     apt-get clean
 
 # Install Scrcpy
-ENV SCRCPY_VER=1.8
+ENV SCRCPY_VER=1.10
 RUN cd /opt && git clone https://github.com/Genymobile/scrcpy && \
     cd scrcpy && \
     curl -L -o scrcpy-server.jar https://github.com/Genymobile/scrcpy/releases/download/v${SCRCPY_VER}/scrcpy-server-v${SCRCPY_VER}.jar && \
