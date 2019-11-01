@@ -7,13 +7,13 @@ RUN apt-get update && apt-get install -y openjdk-8-jdk git wget curl unzip build
     gcc make pkg-config meson ninja-build libavcodec-dev libavformat-dev libavutil-dev libsdl2-dev zsh nano vim
 
 # Install node
-ENV NODE_VERSION=10.15.3
+ENV NODE_VERSION=10.17.0
 RUN curl --retry 3 -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" && \
     tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 && \
     rm "node-v$NODE_VERSION-linux-x64.tar.gz"
 
 # Update NPM
-ENV NPM_VERSION=6.9.0
+ENV NPM_VERSION=6.12.0
 RUN npm install -g npm@"$NPM_VERSION"
 
 # Install ionic dev dependencies
