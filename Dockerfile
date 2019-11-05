@@ -1,62 +1,13 @@
 FROM ubuntu:18.04
 LABEL name="ionic" author="Diego Varela" maintainer="diegovarela.paiva@hotmail.com"
 
-# Install basics
-ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
-RUN apt-get update && apt-get install -y openjdk-8-jdk git wget curl unzip build-essential ruby ruby-dev ruby-ffi \
-    gcc make pkg-config meson ninja-build libavcodec-dev libavformat-dev libavutil-dev libsdl2-dev zsh nano vim
-
-# Install node
-ENV NODE_VERSION=10.17.0
-RUN curl --retry 3 -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" && \
-    tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 && \
-    rm "node-v$NODE_VERSION-linux-x64.tar.gz"
-
-# Update NPM
-ENV NPM_VERSION=6.12.0
-RUN npm install -g npm@"$NPM_VERSION"
-
-# Install ionic dev dependencies
-ENV CORDOVA_VERSION=8.1.2 IONIC_VERSION=4.12.0 YARN=1.16.0
-RUN npm install -g cordova@"$CORDOVA_VERSION" ionic@"$IONIC_VERSION" yarn@"$YARN" @angular/language-service@7.1
-
-# Install Gradle
-ENV GRADLE_VERSION=5.4.1
-ENV PATH=${PATH}:/opt/gradle/gradle-"$GRADLE_VERSION"/bin
-RUN wget https://services.gradle.org/distributions/gradle-"$GRADLE_VERSION"-bin.zip && \
-    mkdir /opt/gradle && \
-    unzip -d /opt/gradle gradle-"$GRADLE_VERSION"-bin.zip && \
-    rm -rf gradle-"$GRADLE_VERSION"-bin.zip
-
-# Install Android SDK
-ENV ANDROID_SDK_ROOT=/opt/android-sdk
-ENV PATH=${PATH}:${ANDROID_SDK_ROOT}/tools:${ANDROID_SDK_ROOT}/tools/bin:${ANDROID_SDK_ROOT}/platform-tools
-RUN mkdir -p $ANDROID_SDK_ROOT && cd $ANDROID_SDK_ROOT && \
-    wget -O tools.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip && \
-    unzip tools.zip && rm tools.zip && \
-    yes | sdkmanager --licenses && \
-    sdkmanager "platform-tools" "platforms;android-28" "build-tools;28.0.3" && \
-    chmod a+x -R $ANDROID_SDK_ROOT && \
-    chown -R root:root $ANDROID_SDK_ROOT && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    apt-get autoremove -y && \
-    apt-get clean
-
-# Install Scrcpy
-ENV SCRCPY_VER=1.8
-RUN cd /opt && git clone https://github.com/Genymobile/scrcpy && \
-    cd scrcpy && \
-    curl -L -o scrcpy-server.jar https://github.com/Genymobile/scrcpy/releases/download/v${SCRCPY_VER}/scrcpy-server-v${SCRCPY_VER}.jar && \
-    meson x --buildtype release --strip -Db_lto=true -Dprebuilt_server=scrcpy-server.jar && \
-    cd x && ninja && ninja install && \
-    rm -rf /opt/scrcpy
-
 # Install Chrome
-RUN apt-get update && \
-    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
-    apt-get install -y software-properties-common &&\
-    apt-add-repository "deb http://archive.canonical.com/ubuntu $(lsb_release -sc) partner" && \
-    apt-add-repository ppa:malteworld/ppa && apt-get update && apt-get install -y \
+RUN echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections \
+    && apt-get update \
+    && apt-get install -y software-properties-common \
+    && apt-add-repository "deb http://archive.canonical.com/ubuntu $(lsb_release -sc) partner" \
+    && apt-add-repository ppa:malteworld/ppa \
+    && apt-get install -y \
     adobe-flashplugin \
     msttcorefonts \
     fonts-noto-color-emoji \
@@ -104,10 +55,63 @@ RUN apt-get update && \
     libnss3 \
     lsb-release \
     xdg-utils \
-    xvfb && \
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    dpkg -i google-chrome-stable_current_amd64.deb && apt-get install -f && \
-    rm google-chrome-stable_current_amd64.deb
+    xvfb \
+    && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && dpkg -i google-chrome-stable_current_amd64.deb \
+    && apt-get install -f \
+    && rm google-chrome-stable_current_amd64.deb
 
-RUN mkdir myApp
-WORKDIR /myApp
+# Install basic
+RUN apt-get install -y sudo zsh
+
+# Configure user
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
+    && useradd --system --uid 1000 --shell /bin/zsh --create-home diego \
+    && adduser diego sudo
+USER diego
+WORKDIR /home/diego
+
+# Install oh-my-zsh
+RUN sudo apt-get install -y wget git
+ENV TERM xterm
+RUN wget -O- https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | zsh || true
+SHELL [ "/bin/zsh", "-i", "-c" ]
+
+# Install asdf
+RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.4 \
+    && echo -e '\n. $HOME/.asdf/asdf.sh' >> ~/.zshrc \
+    && echo -e '\n. $HOME/.asdf/completions/asdf.bash' >> ~/.zshrc
+
+# Install java-8
+RUN sudo apt-get install -y jq curl
+RUN asdf plugin-add java \
+    && asdf install java amazon-corretto-8.212.04.2 \
+    && asdf global java amazon-corretto-8.212.04.2 \
+    && echo -e '\n. $HOME/.asdf/plugins/java/set-java-home.sh' >> ~/.zshrc
+
+# Install nodejs
+RUN sudo apt-get install -y gpg
+RUN asdf plugin-add nodejs \
+    && bash ~/.asdf/plugins/nodejs/bin/import-release-team-keyring \
+    && asdf install nodejs 10.17.0 \
+    && asdf global nodejs 10.17.0
+RUN npm install -g cordova@8.1 ionic@4.12 yarn @angular/language-service tslint
+
+# Install gradle
+RUN sudo apt-get install -y unzip 
+RUN asdf plugin-add gradle \
+    && asdf install gradle 4.10.3 \
+    && asdf global gradle 4.10.3
+
+# Install android-sdk
+ENV ANDROID_SDK_ROOT=/home/diego/android-sdk
+ENV PATH=${PATH}:${ANDROID_SDK_ROOT}/tools:${ANDROID_SDK_ROOT}/tools/bin:${ANDROID_SDK_ROOT}/platform-tools
+RUN mkdir -p $ANDROID_SDK_ROOT && cd $ANDROID_SDK_ROOT \
+    && wget -O tools.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip \
+    && unzip tools.zip && rm tools.zip \
+    && yes | sdkmanager --licenses \
+    && sdkmanager "platform-tools" "platforms;android-28" "build-tools;28.0.3"
+
+RUN mkdir /home/diego/app
+WORKDIR /home/diego/app
+CMD "zsh"

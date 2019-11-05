@@ -8,19 +8,13 @@ Container for develop with ionic 4
 
 ```
 ionicDockerStart() {
-    xhost + local:docker
-    CURRENT_DIR=${PWD##*/}
-    docker run --name $CURRENT_DIR -dt --net host --privileged \
-        -v /dev/bus/usb:/dev/bus/usb \
-        -v ~/.gradle:/root/.gradle \
-        -v /tmp/.X11-unix:/tmp/.X11-unix \
-        -v $PWD:/myApp:rw \
-        -e DISPLAY=$DISPLAY \
-        diegovarela/ionic
-    docker cp ~/.ssh $CURRENT_DIR:/root/.ssh
-    docker exec -it $CURRENT_DIR chown -R root:users /root/.ssh
-    docker cp ~/.gitconfig $CURRENT_DIR:/etc/gitconfig
-    docker cp ~/.gitmessage $CURRENT_DIR:/root/.gitmessage
+  CURRENT_DIR=${PWD##*/}
+  docker run --name $CURRENT_DIR -dt --net host --privileged \
+    -v /dev/bus/usb:/dev/bus/usb \
+    -v $PWD:/home/diego/app:rw \
+    docker-ionic:latest
+  docker cp ~/.ssh $CURRENT_DIR:/home/diego/.ssh
+  docker cp ~/.gitconfig $CURRENT_DIR:/home/diego/gitconfig
 }
 
 ionicDockerStop() {
