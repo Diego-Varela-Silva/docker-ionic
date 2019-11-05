@@ -79,15 +79,15 @@ SHELL [ "/bin/zsh", "-i", "-c" ]
 
 # Install asdf
 RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.4 \
-    && echo -e '\n. $HOME/.asdf/asdf.sh' >> ~/.zshrc \
-    && echo -e '\n. $HOME/.asdf/completions/asdf.bash' >> ~/.zshrc
+    && echo -e '\n. /home/diego/.asdf/asdf.sh' >> ~/.zshrc \
+    && echo -e '\n. /home/diego/.asdf/completions/asdf.bash' >> ~/.zshrc
 
 # Install java-8
 RUN sudo apt-get install -y jq curl
 RUN asdf plugin-add java \
     && asdf install java amazon-corretto-8.212.04.2 \
     && asdf global java amazon-corretto-8.212.04.2 \
-    && echo -e '\n. $HOME/.asdf/plugins/java/set-java-home.sh' >> ~/.zshrc
+    && echo -e '\n. /home/diego/.asdf/plugins/java/set-java-home.sh' >> ~/.zshrc
 
 # Install nodejs
 RUN sudo apt-get install -y gpg
